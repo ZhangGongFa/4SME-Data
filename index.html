@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4SME – Báo Cáo Ngành Spa</title>
+
+    <!-- TailwindCSS for quick styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js for charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Leaflet for interactive map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Favicon -->
+    <link rel="icon" href="https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-6/558902607_122094190623074507_3739202067878026280_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=4bRMLHkCPJkQ7kNvwHpvZhL&_nc_oc=AdnvZM7pGYJSomV6iVf3v40dU3z-ew-7wyNyME4M2QQh9zAoUxnqNefghDC0Hl7IGT4&_nc_zt=23&_nc_ht=scontent.fsgn19-1.fna&_nc_gid=W2RImmbE4KZX9WRRI2vPRQ&oh=00_AffaR1qjsLokkR_mYofqhA16-9YuaMVUnrqWe5yV3ZYtTQ&oe=6902D1F9" type="image/jpeg" />
+
+    <style>
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+        }
+        /* container shadows */
+        .card {
+            @apply bg-white p-6 rounded-xl shadow-lg transition-transform duration-300 hover:-translate-y-1 hover:shadow-2xl;
+        }
+        .stat {
+            @apply bg-white p-6 rounded-lg shadow border;
+        }
+        .tab-button {
+            @apply px-6 py-3 font-medium text-gray-600 border-b-2 border-transparent transition-colors duration-300;
+        }
+        .tab-button.active {
+            @apply text-blue-600 border-blue-600;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        #map { height: 400px; }
+        /* timeline dots */
+        .dot {
+            @apply absolute -left-3 top-1 w-6 h-6 bg-blue-600 rounded-full border-4 border-white;
+        }
+        /* scroll to top button */
+        #backToTop {
+            @apply fixed bottom-6 right-6 bg-blue-600 text-white rounded-full p-3 shadow-lg hover:bg-blue-700 transition-transform transform hover:scale-110 hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white shadow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <a href="#" class="flex items-center space-x-2">
+                    <img src="https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-6/558902607_122094190623074507_3739202067878026280_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=4bRMLHkCPJkQ7kNvwHpvZhL&_nc_oc=AdnvZM7pGYJSomV6iVf3v40dU3z-ew-7wyNyME4M2QQh9zAoUxnqNefghDC0Hl7IGT4&_nc_zt=23&_nc_ht=scontent.fsgn19-1.fna&_nc_gid=W2RImmbE4KZX9WRRI2vPRQ&oh=00_AffaR1qjsLokkR_mYofqhA16-9YuaMVUnrqWe5yV3ZYtTQ&oe=6902D1F9" alt="Logo 4SME" class="h-12 w-auto" />
+                    <span class="text-2xl font-bold text-gray-800">4SME</span>
+                </a>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#problem" class="hover:text-blue-600">Bối Cảnh</a>
+                    <a href="#market" class="hover:text-blue-600">Thị Trường</a>
+                    <a href="#competition" class="hover:text-blue-600">Đối Thủ</a>
+                    <a href="#customer" class="hover:text-blue-600">Khách Hàng</a>
+                    <a href="#forecast" class="hover:text-blue-600">Dự Báo & Xu Hướng</a>
+                    <a href="#segments" class="hover:text-blue-600">Phân Khúc</a>
+                    <a href="#solution" class="hover:text-blue-600">Giải Pháp</a>
+                    <a href="#contact" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Liên Hệ Tư Vấn</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section with gradient background -->
+        <section class="relative bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+                <h1 class="uppercase text-blue-600 font-bold tracking-wider text-sm">BÁO CÁO PHÂN TÍCH THỊ TRƯỜNG & GIẢI PHÁP TĂNG TRƯỞNG</h1>
+                <p class="mt-4 text-4xl sm:text-5xl font-extrabold text-gray-900">Ngành Spa tại TP. Hồ Chí Minh</p>
+                <p class="mt-6 max-w-3xl mx-auto text-lg text-gray-700">Phân tích bởi <span class="font-bold text-gray-900">4SME</span> | Cung cấp thông tin chi tiết dựa trên AI và Big Data để giúp bạn đưa ra quyết định chiến lược, biến đam mê thành lợi nhuận.</p>
+            </div>
+        </section>
+
+        <!-- Problem Section -->
+        <section id="problem" class="py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="card border-t-4 border-blue-600">
+                    <h2 class="text-3xl font-bold mb-4">Bối Cảnh: Câu Chuyện Của Bạn</h2>
+                    <div class="space-y-4 text-lg">
+                        <p class="italic text-xl text-gray-800">"Chị có chuyên môn tốt và mở một tiệm spa của riêng mình. Nhưng kiến thức marketing chỉ ở con số 0..."</p>
+                        <p>Đây là câu chuyện phổ biến chúng tôi ghi nhận được. Bạn có tay nghề, có đam mê, nhưng việc tiếp cận khách hàng trong một thị trường khốc liệt là vô cùng khó khăn. Dù đã có tương tác, bạn vẫn "loay hoay" vì không thể phát triển mạnh hơn.</p>
+                        <p class="font-semibold text-red-600">Vấn đề cốt lõi: Bạn chưa thực sự hiểu rõ nhu cầu và tâm lý của khách hàng, dẫn đến việc truyền thông và phát triển dịch vụ chưa phù hợp.</p>
+                        <p class="font-semibold text-green-600">Giải pháp của 4SME: Chúng tôi sẽ sử dụng công nghệ phân tích dữ liệu và lắng nghe mạng xã hội để cung cấp cho bạn một bức tranh rõ nét về thị trường, giúp bạn nhìn thấy chính xác những gì khách hàng muốn và đối thủ đang làm.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Market Section -->
+        <section id="market" class="py-16 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-2">Phần 1: Toàn Cảnh Thị Trường</h2>
+                <p class="text-center text-gray-600 mb-12">"Miếng bánh" tỷ đô và nghịch lý đào thải khốc liệt.</p>
+                <!-- Key stats -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div class="stat">
+                        <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Quy mô thị trường spa toàn cầu (2024)</h3>
+                        <p class="text-3xl font-bold text-blue-600">$99.79&nbsp;Tỷ</p>
+                        <p class="text-sm text-gray-500">Dự kiến đạt $114.62&nbsp;tỷ năm 2025 và $264.95&nbsp;tỷ năm 2032</p>
+                    </div>
+                    <div class="stat">
+                        <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Số lượng cơ sở Spa tại TP.HCM</h3>
+                        <p class="text-3xl font-bold text-blue-600">~7&nbsp;000+</p>
+                        <p class="text-sm text-gray-500">Tâm điểm của ngành làm đẹp</p>
+                    </div>
+                    <div class="stat bg-red-50 border-red-200">
+                        <h3 class="text-sm font-medium uppercase tracking-wide text-red-700 mb-1">Tỷ lệ Đào thải</h3>
+                        <p class="text-3xl font-bold text-red-600">42.4%</p>
+                        <p class="text-sm text-red-600">Thất bại do thiếu chiến lược & marketing</p>
+                    </div>
+                </div>
+                <!-- Charts row -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="card">
+                        <h3 class="text-xl font-bold mb-3">Nguyên Nhân Thất Bại</h3>
+                        <p class="text-sm text-gray-600 mb-4">Phân tích social listening cho thấy lý do thất bại không phải thiếu nhu cầu.</p>
+                        <div class="h-72"><canvas id="failureReasonChart"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <h3 class="text-xl font-bold mb-3">Xu Hướng Nổi Bật (2024–2025)</h3>
+                        <p class="text-sm text-gray-600 mb-4">Các chủ đề "nóng" được nhắc đến nhiều trên mạng xã hội.</p>
+                        <div class="h-72"><canvas id="trendsChart"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <h3 class="text-xl font-bold mb-3">Tăng trưởng thị trường spa toàn cầu</h3>
+                        <p class="text-sm text-gray-600 mb-4">Dữ liệu 2019–2032 cho thấy ngành spa toàn cầu đang tăng trưởng mạnh.</p>
+                        <div class="h-72"><canvas id="growthChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Competition Section -->
+        <section id="competition" class="py-16 bg-gray-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-2">Phần 2: Bản Đồ Cạnh Tranh</h2>
+                <p class="text-center text-gray-600 mb-12">Ai đang tham gia cuộc chơi và đâu là "khoảng trống" thị trường dành cho bạn?</p>
+                <!-- Map card -->
+                <div class="card mb-12">
+                    <h3 class="text-xl font-bold mb-2">Bản Đồ Phân Bố Đối Thủ (Mô phỏng)</h3>
+                    <p class="text-sm text-gray-600 mb-4">Phân tích mật độ đối thủ theo phân khúc tại các quận trung tâm TP.HCM.</p>
+                    <div id="map"></div>
+                </div>
+                <!-- Competitor cards displayed simultaneously -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Clinic segment -->
+                    <div class="card p-0">
+                        <h4 class="text-white px-4 py-3 rounded-t-lg bg-purple-600 font-bold">Clinic Cao Cấp</h4>
+                        <div class="p-4 space-y-2">
+                            <p><strong>Ví dụ đối thủ:</strong> VITA Clinic (Q.1 & Q.7).</p>
+                            <p><strong>Chiến lược:</strong> Uy tín y khoa, công nghệ cao.</p>
+                            <p><strong>Điểm mạnh:</strong> Đội ngũ bác sĩ, thương hiệu sang trọng.</p>
+                            <p><strong>Điểm yếu:</strong> Giá rất cao, thiếu sự ấm cúng.</p>
+                            <p><strong>Cơ hội:</strong> Khách hàng tìm kiếm thư giãn nhưng chi phí hợp lý.</p>
+                        </div>
+                    </div>
+                    <!-- Chain segment -->
+                    <div class="card p-0">
+                        <h4 class="text-white px-4 py-3 rounded-t-lg bg-blue-600 font-bold">Chuỗi Trung Cấp</h4>
+                        <div class="p-4 space-y-2">
+                            <p><strong>Ví dụ đối thủ:</strong> Seoul Spa (Q.3 & Q.10).</p>
+                            <p><strong>Chiến lược:</strong> Quy mô lớn, tiện lợi, nhiều khuyến mãi.</p>
+                            <p><strong>Điểm mạnh:</strong> Mạng lưới rộng, giá cạnh tranh.</p>
+                            <p><strong>Điểm yếu:</strong> Thiếu cá nhân hóa, ồn ào.</p>
+                            <p><strong>Cơ hội:</strong> Khách hàng mong muốn dịch vụ cá nhân hóa.</p>
+                        </div>
+                    </div>
+                    <!-- Wellness segment -->
+                    <div class="card p-0">
+                        <h4 class="text-white px-4 py-3 rounded-t-lg bg-green-600 font-bold">Wellness/Trải nghiệm</h4>
+                        <div class="p-4 space-y-2">
+                            <p><strong>Ví dụ đối thủ:</strong> Sen Spa (Q.1).</p>
+                            <p><strong>Chiến lược:</strong> Trải nghiệm chữa lành, không gian Á Đông.</p>
+                            <p><strong>Điểm mạnh:</strong> Không gian yên tĩnh, tay nghề massage cao.</p>
+                            <p><strong>Điểm yếu:</strong> Thiếu công nghệ thẩm mỹ cao.</p>
+                            <p><strong>Cơ hội:</strong> Kết hợp công nghệ da với trải nghiệm chữa lành.</p>
+                        </div>
+                    </div>
+                    <!-- Specialty segment -->
+                    <div class="card p-0">
+                        <h4 class="text-white px-4 py-3 rounded-t-lg bg-yellow-500 font-bold">Chuyên Sâu (Ngách)</h4>
+                        <div class="p-4 space-y-2">
+                            <p><strong>Ví dụ đối thủ:</strong> Lori Beauty (Gò Vấp).</p>
+                            <p><strong>Chiến lược:</strong> Chuyên trị mụn, tập trung ngách.</p>
+                            <p><strong>Điểm mạnh:</strong> Hiệu quả nhanh, giá phải chăng.</p>
+                            <p><strong>Điểm yếu:</strong> Quy mô nhỏ, ít đa dạng dịch vụ.</p>
+                            <p><strong>Cơ hội:</strong> Áp dụng mô hình chuyên môn hóa nhưng nâng cấp trải nghiệm.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Customer Section -->
+        <section id="customer" class="py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-2">Phần 3: Giải Mã Khách Hàng Mục Tiêu</h2>
+                <p class="text-center text-gray-600 mb-12">Dữ liệu của 4SME giúp bạn vẽ nên chân dung khách hàng tiềm năng và thấu hiểu hành trình của họ.</p>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                    <!-- Persona 1: Young office worker -->
+                    <div class="bg-white rounded-xl shadow-xl p-6 border-t-4 border-teal-500 relative">
+                        <!-- Embedded base64 avatar for Persona 1 (young office worker) -->
+                        <img src="data:image/png;base64,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" alt="Nhân viên văn phòng" class="w-24 h-24 rounded-full mx-auto -mt-16 border-4 border-white shadow-md" />
+                        <h3 class="text-center text-2xl font-bold mt-4">An Chi – 28&nbsp;tuổi</h3>
+                        <p class="text-center text-teal-600 font-semibold">Nhân viên văn phòng</p>
+                        <ul class="mt-6 space-y-3 text-gray-700 text-sm">
+                            <li><strong>Nhu cầu:</strong> Xả stress và trị mụn do áp lực.</li>
+                            <li><strong>Hành vi:</strong> Tìm kiếm Google "spa trị mụn gần đây", đọc review hội nhóm.</li>
+                            <li><strong>Rào cản:</strong> Nhạy cảm giá (thu nhập 15–20&nbsp;tr), cần đặt lịch online tiện lợi.</li>
+                            <li><strong>Insight 4SME:</strong> Khách hàng thực tế – cần giá trị xứng đáng, review chân thực và sự tiện lợi.</li>
+                        </ul>
+                    </div>
+                    <!-- Persona 2: Businesswoman -->
+                    <div class="bg-white rounded-xl shadow-xl p-6 border-t-4 border-purple-500 relative">
+                        <!-- Embedded base64 avatar for Persona 2 (businesswoman) -->
+                        <img src="data:image/png;base64,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" alt="Doanh nhân" class="w-24 h-24 rounded-full mx-auto -mt-16 border-4 border-white shadow-md" />
+                        <h3 class="text-center text-2xl font-bold mt-4">Cô Lan – 45&nbsp;tuổi</h3>
+                        <p class="text-center text-purple-600 font-semibold">Nữ doanh nhân</p>
+                        <ul class="mt-6 space-y-3 text-gray-700 text-sm">
+                            <li><strong>Nhu cầu:</strong> Chống lão hoá hiệu quả, không gian riêng tư, sang trọng.</li>
+                            <li><strong>Hành vi:</strong> Quyết định dựa trên giới thiệu; chọn thương hiệu uy tín.</li>
+                            <li><strong>Rào cản:</strong> Thiếu thời gian và niềm tin; không tin quảng cáo đại trà.</li>
+                            <li><strong>Insight 4SME:</strong> Khách hàng uy tín – cần tư vấn 1:1, dịch vụ đẳng cấp; giá không phải vấn đề.</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Customer Journey -->
+                <div class="max-w-2xl mx-auto relative">
+                    <h3 class="text-2xl font-bold text-center mb-6">Hành Trình Khách Hàng</h3>
+                    <div class="relative pl-10">
+                        <div class="relative pb-8 border-l-2 border-blue-200">
+                            <div class="dot"></div>
+                            <h4 class="font-bold text-blue-700">1. Nhận thức</h4>
+                            <p class="text-gray-600">Thấy quảng cáo/bạn bè check‑in (<span class="text-red-600">Facebook, Instagram</span>).</p>
+                        </div>
+                        <div class="relative pb-8 border-l-2 border-blue-200">
+                            <div class="dot"></div>
+                            <h4 class="font-bold text-blue-700">2. Cân nhắc</h4>
+                            <p class="text-gray-600">Tìm tên spa, đọc review, so sánh giá (<span class="text-red-600">Google, Group Facebook</span>).</p>
+                        </div>
+                        <div class="relative pb-8 border-l-2 border-blue-200">
+                            <div class="dot"></div>
+                            <h4 class="font-bold text-blue-700">3. Quyết định</h4>
+                            <p class="text-gray-600">Thuyết phục bởi ưu đãi & video review. Đặt lịch qua fanpage (<span class="text-red-600">Messenger, Website</span>).</p>
+                        </div>
+                        <div class="relative pb-8 border-l-2 border-blue-200">
+                            <div class="dot"></div>
+                            <h4 class="font-bold text-blue-700">4. Trải nghiệm</h4>
+                            <p class="text-gray-600">Khoảnh khắc sự thật: mùi hương, lễ tân, tay nghề, không gian (<span class="text-red-600">Spa</span>).</p>
+                        </div>
+                        <div class="relative">
+                            <div class="dot"></div>
+                            <h4 class="font-bold text-blue-700">5. Trung thành</h4>
+                            <p class="text-gray-600">Nhận tin nhắn chăm sóc, để lại review 5 sao và giới thiệu bạn bè (<span class="text-red-600">Zalo, Google&nbsp;Maps</span>).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Forecast & Trends Section -->
+        <section id="forecast" class="py-16 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-2">Phần 4: Dự báo Doanh thu & Xu hướng Tiêu dùng</h2>
+                <p class="text-center text-gray-600 mb-12">Bên cạnh thị trường hiện tại, 4SME cập nhật dự báo doanh thu ngành spa toàn cầu và những xu hướng tiêu dùng đang định hình tương lai.</p>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Revenue Forecast Chart -->
+                    <div class="card">
+                        <h3 class="text-xl font-bold mb-3">Dự báo Doanh thu Thị trường Spa (2024–2030)</h3>
+                        <p class="text-sm text-gray-600 mb-4">Theo Grand View Research, quy mô thị trường spa dịch vụ đạt khoảng 96,51&nbsp;tỷ USD năm 2024 và dự kiến tăng lên 147,11&nbsp;tỷ USD năm 2030. Trong khi đó, báo cáo của Fortune Business Insights dự báo thị trường tăng từ 99,79&nbsp;tỷ USD (2024) lên 264,95&nbsp;tỷ USD năm 2032. Biểu đồ bên so sánh hai kịch bản dự báo.</p>
+                        <div class="h-72"><canvas id="forecastChart"></canvas></div>
+                    </div>
+                    <!-- Consumer Trends & Chart -->
+                    <div class="card">
+                        <h3 class="text-xl font-bold mb-3">Xu hướng Spa nổi bật 2025</h3>
+                        <p class="text-sm text-gray-600 mb-4">Các xu hướng dưới đây được tổng hợp từ các báo cáo ngành và bài viết về spa và wellness. Chúng phản ánh nhu cầu ngày càng tăng đối với trải nghiệm cá nhân hóa, công nghệ, bền vững và chăm sóc toàn diện.</p>
+                        <div class="h-72 mb-4"><canvas id="trendBarChart"></canvas></div>
+                        <ul class="text-sm text-gray-700 space-y-2">
+                            <li><strong>Chăm sóc cá nhân hóa:</strong> Sử dụng AI, phân tích DNA để cá nhân hoá liệu trình.</li>
+                            <li><strong>Liệu pháp toàn diện:</strong> Âm thanh trị liệu, Ayurveda và năng lượng chữa lành kết hợp cơ thể – tâm trí.</li>
+                            <li><strong>Công nghệ & VR:</strong> Thiết bị đeo, thiền thực tế ảo, liệu pháp ánh sáng hồng ngoại, LED.</li>
+                            <li><strong>Bền vững & Zero-waste:</strong> Sử dụng sản phẩm hữu cơ, tiết kiệm năng lượng và nước.</li>
+                            <li><strong>Retreats thiên nhiên:</strong> Trị liệu ngoài trời, tắm rừng và kiến trúc sinh thái.</li>
+                            <li><strong>Skincare & công nghệ cao:</strong> Liệu pháp tế bào gốc, vi dòng và laser.</li>
+                            <li><strong>Âm thanh & rung động:</strong> Liệu pháp âm thanh và rung giúp giảm stress và chữa lành.</li>
+                            <li><strong>Cryotherapy & Thermal:</strong> Liệu pháp lạnh/nóng tăng cường phục hồi và tuần hoàn.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Segment Analysis Section -->
+        <section id="segments" class="py-16 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-2">Phần 5: Phân tích Phân khúc Thị trường</h2>
+                <p class="text-center text-gray-600 mb-12">Dữ liệu phân khúc giúp bạn hiểu sâu hơn về cơ cấu thị trường spa theo loại hình, dịch vụ, trải nghiệm, độ tuổi và giới tính.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Facility share card -->
+                    <div class="card">
+                        <h3 class="text-lg font-bold mb-2">Cơ cấu loại hình Spa</h3>
+                        <p class="text-sm text-gray-600 mb-4">Day spa chiếm 57,12% thị phần năm 2024 – khách hàng ưu tiên trải nghiệm ngắn ngày. Các loại hình khác gồm spa khách sạn/resort, spa y khoa và điểm đến.</p>
+                        <div class="h-64"><canvas id="facilityChart"></canvas></div>
+                    </div>
+                    <!-- Service share card -->
+                    <div class="card">
+                        <h3 class="text-lg font-bold mb-2">Cơ cấu dịch vụ</h3>
+                        <p class="text-sm text-gray-600 mb-4">Dịch vụ massage thống trị với 42,52% thị phần năm 2025. Các dịch vụ khác bao gồm làm đẹp/grooming, thể chất (yoga/fitness) và liệu pháp hydro khác.</p>
+                        <div class="h-64"><canvas id="serviceChart"></canvas></div>
+                    </div>
+                    <!-- Experience share card -->
+                    <div class="card">
+                        <h3 class="text-lg font-bold mb-2">Trải nghiệm (Luxury vs Budget)</h3>
+                        <p class="text-sm text-gray-600 mb-4">Phân khúc Luxury chiếm ưu thế với 66,92% thị phần năm 2025, trong khi phân khúc Budget thân thiện hơn chiếm phần còn lại.</p>
+                        <div class="h-64"><canvas id="experienceChart"></canvas></div>
+                    </div>
+                    <!-- Age group card -->
+                    <div class="card">
+                        <h3 class="text-lg font-bold mb-2">Nhóm tuổi khách hàng</h3>
+                        <p class="text-sm text-gray-600 mb-4">Nhóm tuổi 19–35 dẫn đầu với 55,15% thị phần. Các nhóm tuổi khác bao gồm dưới 18, 36–50 và trên 50 tuổi.</p>
+                        <div class="h-64"><canvas id="ageChart"></canvas></div>
+                    </div>
+                    <!-- Gender share card -->
+                    <div class="card">
+                        <h3 class="text-lg font-bold mb-2">Giới tính người dùng</h3>
+                        <p class="text-sm text-gray-600 mb-4">Nữ giới chiếm khoảng 63,87% thị trường spa năm 2025; nam giới đang tăng trưởng nhanh với khoảng 36,13%.</p>
+                        <div class="h-64"><canvas id="genderChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Solution Section -->
+        <section id="solution" class="py-20 bg-gray-800 text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4 text-yellow-300">Phần 6: Lộ Trình Tăng Trưởng từ 4SME</h2>
+                <p class="text-center text-gray-300 mb-12 max-w-3xl mx-auto">Dựa trên dữ liệu, đây là lộ trình ba bước 4SME đề xuất để giúp spa của bạn bứt phá.</p>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Step 1 -->
+                    <div class="bg-gray-700 p-6 rounded-lg shadow-lg">
+                        <span class="text-4xl font-bold text-blue-300">01</span>
+                        <h3 class="text-2xl font-bold mt-2 mb-3 text-white">Xây Nền Tảng</h3>
+                        <p class="text-gray-300">Bạn không thể làm hài lòng tất cả mọi người. Dữ liệu cho thấy vẫn còn khoảng trống lớn.</p>
+                        <ul class="mt-4 space-y-2 list-disc list-inside text-gray-200 text-sm">
+                            <li><strong>Định vị:</strong> "Spa trị liệu & thư giãn chuyên sâu cho nhân viên văn phòng".</li>
+                            <li><strong>Câu chuyện:</strong> Sử dụng chính câu chuyện tay nghề cao của bạn để xây dựng lòng tin.</li>
+                            <li><strong>Công nghệ:</strong> Phân tích đối thủ để tìm ra ngách phù hợp.</li>
+                        </ul>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="bg-gray-700 p-6 rounded-lg shadow-lg">
+                        <span class="text-4xl font-bold text-blue-300">02</span>
+                        <h3 class="text-2xl font-bold mt-2 mb-3 text-white">Thu Hút</h3>
+                        <p class="text-gray-300">Đưa khách hàng lần đầu ghé thăm spa của bạn.</p>
+                        <ul class="mt-4 space-y-2 list-disc list-inside text-gray-200 text-sm">
+                            <li><strong>Dịch vụ mồi:</strong> Gói "Gội đầu dưỡng sinh" hoặc "Massage cổ vai gáy" giá hợp lý.</li>
+                            <li><strong>SEO địa phương:</strong> Tối ưu Google Business "spa thư giãn [Quận của bạn]".</li>
+                            <li><strong>Công nghệ:</strong> Lắng nghe social listening để chọn từ khoá chạy quảng cáo hiệu quả.</li>
+                        </ul>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="bg-gray-700 p-6 rounded-lg shadow-lg">
+                        <span class="text-4xl font-bold text-blue-300">03</span>
+                        <h3 class="text-2xl font-bold mt-2 mb-3 text-white">Giữ Chân</h3>
+                        <p class="text-gray-300">Biến khách hàng một lần thành fan trung thành.</p>
+                        <ul class="mt-4 space-y-2 list-disc list-inside text-gray-200 text-sm">
+                            <li><strong>Chăm sóc tự động:</strong> Gửi tin nhắn Zalo hỏi thăm sau dịch vụ.</li>
+                            <li><strong>Đánh giá:</strong> Chủ động xin review từ khách hàng hài lòng.</li>
+                            <li><strong>Công nghệ:</strong> Sử dụng AI để theo dõi cảm xúc của khách hàng và dự báo rủi ro.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900">Bạn đã sẵn sàng biến dữ liệu thành lợi nhuận?</h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Câu chuyện của bạn không cần kết thúc bằng sự loay hoay. Hãy để công nghệ AI và đội ngũ 4SME trở thành phòng marketing của bạn.</p>
+                <a href="mailto:contact@4sme.vn" class="inline-block mt-8 bg-blue-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-700 transition transform hover:scale-105">Liên Hệ Tư Vấn Gói Dịch Vụ 1:1</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2025 4SME. All rights reserved.</p>
+            <p class="text-sm text-gray-400 mt-1">Báo cáo này là sản phẩm demo nhằm minh hoạ khả năng phân tích của 4SME.</p>
+        </div>
+    </footer>
+
+    <!-- Back to top button -->
+    <button id="backToTop" aria-label="Back to top">
+        ▲
+    </button>
+
+    <script>
+        // Tab switching logic (only if tab buttons exist)
+        const tabButtons = document.querySelectorAll('.tab-button');
+        if (tabButtons.length) {
+            tabButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.getAttribute('data-tab');
+                    tabButtons.forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    btn.classList.add('active');
+                    const contentEl = document.getElementById(tabId);
+                    if (contentEl) contentEl.classList.add('active');
+                });
+            });
+            const defaultTab = document.querySelector('.tab-button[data-tab="clinic"]');
+            if (defaultTab) defaultTab.click();
+        }
+
+        // Chart default settings
+        const baseChartOpts = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { font: { family: "Be Vietnam Pro, sans-serif" }, padding: 16 }
+                },
+                tooltip: {
+                    titleFont: { family: "Be Vietnam Pro, sans-serif" },
+                    bodyFont: { family: "Be Vietnam Pro, sans-serif" }
+                }
+            }
+        };
+        document.addEventListener('DOMContentLoaded', () => {
+            // Doughnut chart
+            new Chart(document.getElementById('failureReasonChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Thiếu Marketing & Quản trị', 'Cạnh tranh về giá', 'Chất lượng dịch vụ kém', 'Vị trí xấu'],
+                    datasets: [{
+                        data: [42.4, 25, 20, 12.6],
+                        backgroundColor: ['#DC2626', '#F59E0B', '#FACC15', '#6B7280']
+                    }]
+                },
+                options: { ...baseChartOpts }
+            });
+            // Horizontal bar chart
+            new Chart(document.getElementById('trendsChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Spa Wellness (Chữa lành)', 'Cá nhân hóa', 'Sản phẩm Xanh & Hữu cơ', 'Tích hợp Công nghệ'],
+                    datasets: [{
+                        data: [9500, 8200, 7800, 6500],
+                        backgroundColor: ['#10B981', '#3B82F6', '#8B5CF6', '#F97316'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    ...baseChartOpts,
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false } }
+                }
+            });
+            // Line chart
+            new Chart(document.getElementById('growthChart'), {
+                type: 'line',
+                data: {
+                    labels: ['2019','2020','2021','2022','2023','2024','2025','2026','2027','2028','2029','2030','2031','2032'],
+                    datasets: [{
+                        label: 'Doanh thu thị trường spa toàn cầu (tỷ USD)',
+                        // Số liệu ước tính dựa trên báo cáo Fortune Business Insights: 2024=99.79, 2025=114.62, 2032=264.95
+                        data: [80, 82, 85, 90, 95, 99.79, 114.62, 130, 150, 175, 200, 220, 242, 264.95],
+                        borderColor: '#2563EB',
+                        backgroundColor: 'rgba(37,99,235,0.2)',
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    ...baseChartOpts,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: baseChartOpts.plugins.tooltip
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: value => value + 'B'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Tỷ USD',
+                                font: { family: "Be Vietnam Pro, sans-serif", weight: '500' }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Năm'
+                            }
+                        }
+                    }
+                }
+            });
+            // Forecast chart (Global spa revenue forecast)
+            const fcEl = document.getElementById('forecastChart');
+            if (fcEl) {
+                new Chart(fcEl, {
+                    type: 'line',
+                    data: {
+                        labels: ['2024','2025','2026','2027','2028','2029','2030','2031','2032'],
+                        datasets: [
+                            {
+                                label: 'Grand View Research',
+                                data: [96.51, 102.32, 110, 118, 126, 135, 147.11, null, null],
+                                borderColor: '#EF4444',
+                                backgroundColor: 'rgba(239,68,68,0.2)',
+                                tension: 0.3
+                            },
+                            {
+                                label: 'Fortune Business Insights',
+                                data: [99.79, 114.62, 130, 150, 180, 210, 230, 248, 264.95],
+                                borderColor: '#2563EB',
+                                backgroundColor: 'rgba(37,99,235,0.2)',
+                                tension: 0.3
+                            }
+                        ]
+                    },
+                    options: {
+                        ...baseChartOpts,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom',
+                                labels: { font: { family: 'Be Vietnam Pro, sans-serif' } }
+                            },
+                            tooltip: baseChartOpts.plugins.tooltip
+                        },
+                        scales: {
+                            y: {
+                                title: { display: true, text: 'Tỷ USD', font: { family: 'Be Vietnam Pro, sans-serif', weight: '500' } },
+                                ticks: { callback: v => v + 'B' }
+                            },
+                            x: { title: { display: true, text: 'Năm' } }
+                        }
+                    }
+                });
+            }
+            // Trend bar chart (consumer trend popularity)
+            const tbEl = document.getElementById('trendBarChart');
+            if (tbEl) {
+                new Chart(tbEl, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Cá nhân hoá', 'Liệu pháp toàn diện', 'Công nghệ/VR', 'Bền vững', 'Retreats thiên nhiên', 'Skincare nâng cao', 'Âm thanh & rung', 'Cryotherapy'],
+                        datasets: [{
+                            label: 'Mức độ phổ biến (tham khảo)',
+                            data: [10, 9, 8, 7, 6, 5, 4, 5],
+                            backgroundColor: ['#3B82F6','#10B981','#6366F1','#F59E0B','#EF4444','#8B5CF6','#06B6D4','#F472B6'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        ...baseChartOpts,
+                        indexAxis: 'y',
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { title: { display: false } },
+                            y: { ticks: { display: true, font: { family: 'Be Vietnam Pro, sans-serif' } } }
+                        }
+                    }
+                });
+            }
+
+            // === Segmentation Charts ===
+            // Facility share chart
+            const facilityEl = document.getElementById('facilityChart');
+            if (facilityEl) {
+                new Chart(facilityEl, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Day Spa', 'Khách sạn/Resort', 'Medical Spa', 'Khác'],
+                        datasets: [{
+                            label: 'Thị phần loại hình (%)',
+                            data: [57.12, 21.86, 12, 9.02],
+                            backgroundColor: ['#10B981','#3B82F6','#FBBF24','#F87171']
+                        }]
+                    },
+                    options: {
+                        ...baseChartOpts,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: baseChartOpts.plugins.tooltip
+                        }
+                    }
+                });
+            }
+            // Service share chart
+            const serviceEl = document.getElementById('serviceChart');
+            if (serviceEl) {
+                new Chart(serviceEl, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Massage', 'Làm đẹp/Grooming', 'Thể chất/Yoga', 'Khác'],
+                        datasets: [{
+                            label: 'Thị phần dịch vụ (%)',
+                            data: [42.52, 28, 15, 14.48],
+                            backgroundColor: ['#8B5CF6','#F97316','#22C55E','#EAB308']
+                        }]
+                    },
+                    options: {
+                        ...baseChartOpts,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: baseChartOpts.plugins.tooltip
+                        }
+                    }
+                });
+            }
+            // Experience share chart (Luxury vs Budget)
+            const expEl = document.getElementById('experienceChart');
+            if (expEl) {
+                new Chart(expEl, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Luxury', 'Budget'],
+                        datasets: [{
+                            data: [66.92, 33.08],
+                            backgroundColor: ['#FBBF24','#60A5FA']
+                        }]
+                    },
+                    options: {
+                        ...baseChartOpts,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: baseChartOpts.plugins.tooltip
+                        }
+                    }
+                });
+            }
+            // Age group share chart
+            const ageEl = document.getElementById('ageChart');
+            if (ageEl) {
+                new Chart(ageEl, {
+                    type: 'pie',
+                    data: {
+                        labels: ['19–35', '36–50', 'Dưới 18', 'Trên 50'],
+                        datasets: [{
+                            data: [55.15, 20, 15, 9.85],
+                            backgroundColor: ['#4ADE80','#F472B6','#A78BFA','#34D399']
+                        }]
+                    },
+                    options: {
+                        ...baseChartOpts,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: baseChartOpts.plugins.tooltip
+                        }
+                    }
+                });
+            }
+            // Gender share chart
+            const genEl = document.getElementById('genderChart');
+            if (genEl) {
+                new Chart(genEl, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Nữ', 'Nam'],
+                        datasets: [{
+                            data: [63.87, 36.13],
+                            backgroundColor: ['#F472B6','#60A5FA']
+                        }]
+                    },
+                    options: {
+                        ...baseChartOpts,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: baseChartOpts.plugins.tooltip
+                        }
+                    }
+                });
+            }
+            // Leaflet map
+            const map = L.map('map').setView([10.7769, 106.7009], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
+            const icons = {
+                clinic: L.icon({ iconUrl: 'https://img.icons8.com/color/48/hospital-3.png', iconSize: [32,32], iconAnchor: [16,32] }),
+                chain: L.icon({ iconUrl: 'https://img.icons8.com/color/48/shop-department.png', iconSize: [32,32], iconAnchor: [16,32] }),
+                wellness: L.icon({ iconUrl: 'https://img.icons8.com/color/48/lotus.png', iconSize: [32,32], iconAnchor: [16,32] }),
+                specialty: L.icon({ iconUrl: 'https://img.icons8.com/color/48/cosmetic-brush.png', iconSize: [32,32], iconAnchor: [16,32] })
+            };
+            const competitors = [
+                { name: 'VITA Clinic (Q.1)', lat: 10.7758, lng: 106.7011, type: 'clinic' },
+                { name: 'VITA Clinic (Q.7)', lat: 10.7291, lng: 106.7132, type: 'clinic' },
+                { name: 'Seoul Spa (Q.3)', lat: 10.7820, lng: 106.6868, type: 'chain' },
+                { name: 'Seoul Spa (Q.10)', lat: 10.7714, lng: 106.6698, type: 'chain' },
+                { name: 'Sen Spa (Q.1)', lat: 10.7725, lng: 106.7045, type: 'wellness' },
+                { name: 'Lori Beauty (Gò Vấp)', lat: 10.8322, lng: 106.6660, type: 'specialty' }
+            ];
+            competitors.forEach(c => {
+                L.marker([c.lat, c.lng], { icon: icons[c.type] }).addTo(map).bindPopup(`<strong>${c.name}</strong><br/>Phân khúc: ${c.type}`);
+            });
+        });
+        // Back to top behaviour
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) backToTop.classList.remove('hidden');
+            else backToTop.classList.add('hidden');
+        });
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
